@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 def get_openid_connect_profile_model():
     """
-    Return the OpenIdConnectProfile model that is active in this project.
+    Return the RemoteUserOpenIdConnectProfile model that is active in this project.
     """
     try:
         return django_apps.get_model(settings.KEYCLOAK_OIDC_PROFILE_MODEL,
@@ -59,7 +59,7 @@ def get_or_create_from_id_token(client, id_token):
 
     :param django_keycloak.models.Client client:
     :param str id_token:
-    :rtype: django_keycloak.models.OpenIdConnectProfile
+    :rtype: django_keycloak.models.RemoteUserOpenIdConnectProfile
     """
     issuer = django_keycloak.services.realm.get_issuer(client.realm)
 
@@ -83,10 +83,10 @@ def update_or_create_user_and_oidc_profile(client, id_token_object):
     :return:
     """
 
-    OpenIdConnectProfileModel = get_openid_connect_profile_model()
+    RemoteUserOpenIdConnectProfileModel = get_openid_connect_profile_model()
 
-    if OpenIdConnectProfileModel.is_remote:
-        oidc_profile, _ = OpenIdConnectProfileModel.objects.\
+    if RemoteUserOpenIdConnectProfileModel.is_remote:
+        oidc_profile, _ = RemoteUserOpenIdConnectProfileModel.objects.\
             update_or_create(
                 sub=id_token_object['sub'],
                 defaults={
@@ -111,7 +111,7 @@ def update_or_create_user_and_oidc_profile(client, id_token_object):
             }
         )
 
-        oidc_profile, _ = OpenIdConnectProfileModel.objects.update_or_create(
+        oidc_profile, _ = RemoteUserOpenIdConnectProfileModel.objects.update_or_create(
             sub=id_token_object['sub'],
             defaults={
                 'realm': client.realm,
@@ -156,7 +156,7 @@ def update_or_create_from_code(code, client, redirect_uri):
     :param django_keycloak.models.Client client:
     :param str code: authentication code
     :param str redirect_uri
-    :rtype: django_keycloak.models.OpenIdConnectProfile
+    :rtype: django_keycloak.models.RemoteUserOpenIdConnectProfileModel
     """
 
     # Define "initiate_time" before getting the access token to calculate
@@ -179,7 +179,7 @@ def update_or_create_from_password_credentials(username, password, client):
     :param str username: the username to authenticate with
     :param str password: the password to authenticate with
     :param django_keycloak.models.Client client:
-    :rtype: django_keycloak.models.OpenIdConnectProfile
+    :rtype: django_keycloak.models.RemoteUserOpenIdConnectProfileModel
     """
 
     # Define "initiate_time" before getting the access token to calculate
@@ -207,7 +207,7 @@ def _update_or_create(client, token_response, initiate_time):
     :param django_keycloak.models.Client client:
     :param dict token_response:
     :param datetime.datetime initiate_time:
-    :rtype: django_keycloak.models.OpenIdConnectProfile
+    :rtype: django_keycloak.models.RemoteUserOpenIdConnectProfileModel
     """
     issuer = django_keycloak.services.realm.get_issuer(client.realm)
 
@@ -238,7 +238,7 @@ def update_tokens(token_model, token_response, initiate_time):
     :param django_keycloak.models.TokenModelAbstract token_model:
     :param dict token_response: response from OIDC token API end-point
     :param datetime.datetime initiate_time: timestamp before the token request
-    :rtype: django_keycloak.models.OpenIdConnectProfile
+    :rtype: django_keycloak.models.RemoteUserOpenIdConnectProfileModel
     """
     expires_before = initiate_time + timedelta(
         seconds=token_response['expires_in'])

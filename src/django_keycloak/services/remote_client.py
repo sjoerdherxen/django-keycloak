@@ -15,7 +15,7 @@ def exchange_token(oidc_profile, remote_client):
     Exchange access token from OpenID Connect profile for a token of given
     remote client.
 
-    :param django_keycloak.models.OpenIdConnectProfile oidc_profile:
+    :param django_keycloak.models.RemoteUserOpenIdConnectProfileModel oidc_profile:
     :param django_keycloak.models.RemoteClient remote_client:
     :rtype: dict
     """
@@ -34,7 +34,7 @@ def get_active_remote_client_token(oidc_profile, remote_client):
     """
     Get an active remote client token. Exchange when not available or expired.
 
-    :param django_keycloak.models.OpenIdConnectProfile oidc_profile:
+    :param django_keycloak.models.RemoteUserOpenIdConnectProfileModel oidc_profile:
     :param django_keycloak.models.RemoteClient remote_client:
     :rtype: str
     """

@@ -17,7 +17,7 @@ Since **this is the default behaviour for Django Keycloak** you don't have to
 configure any setting.
 
 Important to point out the `KEYCLOAK_OIDC_PROFILE_MODEL` setting. This should
-contain `django_keycloak.OpenIdConnectProfile` (which is the case by default).
+contain `django_keycloak.RemoteUserOpenIdConnectProfile` (which is the case by default).
 The model to store the Open ID Connect profile is a swappable model. When
 configured to this model a foreign key to the configured Django User model is
 available.
@@ -25,4 +25,4 @@ available.
 .. code-block:: python
 
     # settings.py
-    KEYCLOAK_OIDC_PROFILE_MODEL = 'django_keycloak.OpenIdConnectProfile'
+    KEYCLOAK_OIDC_PROFILE_MODEL = 'django_keycloak.RemoteUserOpenIdConnectProfile'

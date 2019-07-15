@@ -2,13 +2,14 @@ import mock
 
 from datetime import datetime
 
-from django.contrib.auth import get_user_model
+from dateutil.relativedelta import relativedelta
 from django.test import TestCase
 from freezegun import freeze_time
 from keycloak.openid_connect import KeycloakOpenidConnect
 
 from django_keycloak.factories import ClientFactory
-from django_keycloak.models import OpenIdConnectProfile
+from django_keycloak.models import RemoteUserOpenIdConnectProfile
+from django_keycloak.remote_user import KeycloakRemoteUser
 from django_keycloak.tests.mixins import MockTestCaseMixin
 
 import django_keycloak.services.oidc_profile
@@ -20,7 +21,7 @@ class ServicesKeycloakOpenIDProfileUpdateOrCreateTestCase(MockTestCaseMixin,
     def setUp(self):
         self.client = ClientFactory(
             realm___certs='{}',
-            realm___well_known_oidc='{"issuer": "https://issuer"}'
+            realm___well_known_oidc='{"issuer": "https://issuer", "userinfo_endpoint": "http://userinfo_endpoint"}'
         )
         self.client.openid_api_client = mock.MagicMock(
             spec_set=KeycloakOpenidConnect)
@@ -42,7 +43,13 @@ class ServicesKeycloakOpenIDProfileUpdateOrCreateTestCase(MockTestCaseMixin,
         }
 
     @freeze_time('2018-03-01 00:00:00')
-    def test_create(self):
+    @mock.patch('django_keycloak.services.oidc_profile.get_remote_user_from_profile')
+    def test_create(self, get_remote_user_from_profile):
+        get_remote_user_from_profile.return_value = KeycloakRemoteUser({
+            'sub': 'some-sub',
+            'given_name': 'Some given name',
+            'family_name': 'Some family name',
+        })
         django_keycloak.services.oidc_profile.update_or_create_from_code(
             client=self.client,
             code='some-code',
@@ -58,7 +65,7 @@ class ServicesKeycloakOpenIDProfileUpdateOrCreateTestCase(MockTestCaseMixin,
             issuer='https://issuer'
         )
 
-        profile = OpenIdConnectProfile.objects.get(sub='some-sub')
+        profile = RemoteUserOpenIdConnectProfile.objects.get(sub='some-sub')
         self.assertEqual(profile.sub, 'some-sub'),
         self.assertEqual(profile.access_token, 'access-token')
         self.assertEqual(profile.refresh_token, 'refresh-token')
@@ -75,22 +82,20 @@ class ServicesKeycloakOpenIDProfileUpdateOrCreateTestCase(MockTestCaseMixin,
         self.assertEqual(user.last_name, 'Some family name')
 
     @freeze_time('2018-03-01 00:00:00')
-    def test_update(self):
-        UserModel = get_user_model()
-        user = UserModel.objects.create(
-            username='some-sub',
-            email='',
-            first_name='',
-            last_name=''
-        )
-        profile = OpenIdConnectProfile.objects.create(
+    @mock.patch('django_keycloak.services.oidc_profile.get_remote_user_from_profile')
+    def test_update(self, get_remote_user_from_profile):
+        get_remote_user_from_profile.return_value = KeycloakRemoteUser({
+            'sub': 'some-sub',
+            'given_name': 'Some given name',
+            'family_name': 'Some family name',
+        })
+        profile = RemoteUserOpenIdConnectProfile.objects.create(
             realm=self.client.realm,
             sub='some-sub',
-            user=user,
-            access_token='another-access-token',
-            expires_before=datetime.now(),
-            refresh_token='another-refresh-token',
-            refresh_expires_before=datetime.now()
+            access_token='access-token',
+            expires_before=datetime.now() + relativedelta(minutes=10),
+            refresh_token='refresh-token',
+            refresh_expires_before=datetime.now() + relativedelta(hours=1)
         )
 
         django_keycloak.services.oidc_profile.update_or_create_from_code(
@@ -108,7 +113,6 @@ class ServicesKeycloakOpenIDProfileUpdateOrCreateTestCase(MockTestCaseMixin,
             issuer='https://issuer'
         )
 
-        profile.refresh_from_db()
         self.assertEqual(profile.sub, 'some-sub')
         self.assertEqual(profile.access_token, 'access-token')
         self.assertEqual(profile.refresh_token, 'refresh-token')
@@ -120,7 +124,6 @@ class ServicesKeycloakOpenIDProfileUpdateOrCreateTestCase(MockTestCaseMixin,
         ))
 
         user = profile.user
-        user.refresh_from_db()
         self.assertEqual(user.username, 'some-sub')
         self.assertEqual(user.first_name, 'Some given name')
         self.assertEqual(user.last_name, 'Some family name')

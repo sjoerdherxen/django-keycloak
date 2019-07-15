@@ -75,7 +75,7 @@ def get_service_account_profile(client):
     Get service account for given client.
 
     :param django_keycloak.models.Client client:
-    :rtype: django_keycloak.models.OpenIdConnectProfile
+    :rtype: django_keycloak.models.RemoteUserOpenIdConnectProfile
     """
 
     if client.service_account_profile:

@@ -6,7 +6,7 @@ from django.test import TestCase
 from freezegun import freeze_time
 from keycloak.openid_connect import KeycloakOpenidConnect
 
-from django_keycloak.factories import OpenIdConnectProfileFactory
+from django_keycloak.factories import RemoteUserOpenIdConnectProfileFactory
 from django_keycloak.tests.mixins import MockTestCaseMixin
 
 import django_keycloak.services.oidc_profile
@@ -16,7 +16,7 @@ class ServicesKeycloakOpenIDProfileGetActiveAccessTokenTestCase(
         MockTestCaseMixin, TestCase):
 
     def setUp(self):
-        self.oidc_profile = OpenIdConnectProfileFactory(
+        self.oidc_profile = RemoteUserOpenIdConnectProfileFactory(
             access_token='access-token',
             expires_before=datetime(2018, 3, 5, 1, 0, 0),
             refresh_token='refresh-token',

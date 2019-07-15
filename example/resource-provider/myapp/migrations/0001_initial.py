@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                 ('expires_before', models.DateTimeField(null=True)),
                 ('refresh_token', models.TextField(null=True)),
                 ('refresh_expires_before', models.DateTimeField(null=True)),
-                ('oidc_profile', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='django_keycloak.OpenIdConnectProfile')),
+                ('oidc_profile', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='django_keycloak.RemoteUserOpenIdConnectProfile')),
             ],
         ),
         migrations.CreateModel(

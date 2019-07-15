@@ -4,10 +4,11 @@ from django.contrib.auth import get_user_model
 
 from django_keycloak.models import (
     Client,
-    OpenIdConnectProfile,
+    RemoteUserOpenIdConnectProfile,
     Realm,
     Server
 )
+from django_keycloak.remote_user import KeycloakRemoteUser
 
 
 class UserFactory(factory.DjangoModelFactory):
@@ -42,14 +43,16 @@ class RealmFactory(factory.DjangoModelFactory):
                                     'realm')
 
 
-class OpenIdConnectProfileFactory(factory.DjangoModelFactory):
+class RemoteUserOpenIdConnectProfileFactory(factory.DjangoModelFactory):
 
     class Meta(object):
-        model = OpenIdConnectProfile
+        model = RemoteUserOpenIdConnectProfile
 
     sub = factory.Faker('uuid4')
     realm = factory.SubFactory(RealmFactory)
-    user = factory.SubFactory(UserFactory)
+    user = KeycloakRemoteUser({
+        'sub': 'admin'
+    })
 
 
 class ClientFactory(factory.DjangoModelFactory):
@@ -59,7 +62,7 @@ class ClientFactory(factory.DjangoModelFactory):
 
     realm = factory.SubFactory(RealmFactory, client=None)
     service_account_profile = factory.SubFactory(
-        OpenIdConnectProfileFactory,
+        RemoteUserOpenIdConnectProfileFactory,
         realm=factory.SelfAttribute('..realm')
     )
 

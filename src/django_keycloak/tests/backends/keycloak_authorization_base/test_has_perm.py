@@ -1,6 +1,6 @@
 from django.test import TestCase, override_settings
 
-from django_keycloak.factories import OpenIdConnectProfileFactory
+from django_keycloak.factories import RemoteUserOpenIdConnectProfileFactory
 from django_keycloak.tests.mixins import MockTestCaseMixin
 from django_keycloak.auth.backends import KeycloakAuthorizationBase
 
@@ -12,7 +12,7 @@ class BackendsKeycloakAuthorizationBaseHasPermTestCase(
     def setUp(self):
         self.backend = KeycloakAuthorizationBase()
 
-        self.profile = OpenIdConnectProfileFactory(user__is_active=True)
+        self.profile = RemoteUserOpenIdConnectProfileFactory(user__is_active=True)
 
         self.setup_mock(
             'django_keycloak.services.oidc_profile.get_entitlement',

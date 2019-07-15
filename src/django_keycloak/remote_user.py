@@ -41,7 +41,7 @@ class KeycloakRemoteUser(object):
         Since the BaseAbstractUser is a model, every instance needs a primary
         key. The Django authentication backend requires this.
         """
-        return 0
+        return -1
 
     @property
     def identifier(self):
