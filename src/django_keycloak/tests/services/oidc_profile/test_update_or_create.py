@@ -84,7 +84,6 @@ class ServicesKeycloakOpenIDProfileUpdateOrCreateTestCase(MockTestCaseMixin,
     @freeze_time('2018-03-01 00:00:00')
     @mock.patch('django_keycloak.services.oidc_profile.get_remote_user_from_profile')
     def test_update(self, get_remote_user_from_profile):
-        # user = KeycloakRemoteUser({'sub': 'admin'})
         get_remote_user_from_profile.return_value = KeycloakRemoteUser({
             'sub': 'some-sub',
             'given_name': 'Some given name',
@@ -98,7 +97,6 @@ class ServicesKeycloakOpenIDProfileUpdateOrCreateTestCase(MockTestCaseMixin,
             refresh_token='refresh-token',
             refresh_expires_before=datetime.now() + relativedelta(hours=1)
         )
-        # profile.user = user
 
         django_keycloak.services.oidc_profile.update_or_create_from_code(
             client=self.client,
@@ -115,7 +113,6 @@ class ServicesKeycloakOpenIDProfileUpdateOrCreateTestCase(MockTestCaseMixin,
             issuer='https://issuer'
         )
 
-        # profile.refresh_from_db()
         self.assertEqual(profile.sub, 'some-sub')
         self.assertEqual(profile.access_token, 'access-token')
         self.assertEqual(profile.refresh_token, 'refresh-token')
@@ -127,7 +124,6 @@ class ServicesKeycloakOpenIDProfileUpdateOrCreateTestCase(MockTestCaseMixin,
         ))
 
         user = profile.user
-        # user.refresh_from_db()
         self.assertEqual(user.username, 'some-sub')
         self.assertEqual(user.first_name, 'Some given name')
         self.assertEqual(user.last_name, 'Some family name')
