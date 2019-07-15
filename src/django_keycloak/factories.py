@@ -8,6 +8,7 @@ from django_keycloak.models import (
     Realm,
     Server
 )
+from django_keycloak.remote_user import KeycloakRemoteUser
 
 
 class UserFactory(factory.DjangoModelFactory):
@@ -49,7 +50,9 @@ class RemoteUserOpenIdConnectProfileFactory(factory.DjangoModelFactory):
 
     sub = factory.Faker('uuid4')
     realm = factory.SubFactory(RealmFactory)
-    user = factory.SubFactory(UserFactory)
+    user = KeycloakRemoteUser({
+        'sub': 'admin'
+    })
 
 
 class ClientFactory(factory.DjangoModelFactory):

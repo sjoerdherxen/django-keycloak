@@ -5,8 +5,11 @@ from datetime import datetime
 from django.test import TestCase
 from keycloak.openid_connect import KeycloakOpenidConnect
 
-from django_keycloak.factories import ClientFactory, \
-    RemoteUserOpenIdConnectProfileFactory, UserFactory
+from django_keycloak.factories import (
+    ClientFactory,
+    RemoteUserOpenIdConnectProfileFactory
+)
+from django_keycloak.remote_user import KeycloakRemoteUser
 from django_keycloak.tests.mixins import MockTestCaseMixin
 
 import django_keycloak.services.oidc_profile
@@ -96,9 +99,9 @@ class ServicesOpenIDProfileGetOrCreateFromIdTokenTestCase(
         The user exists, but the profile doesn't.
         Expected: oidc profile is created and user is linked to the profile.
         """
-        existing_user = UserFactory(
-            username='some-sub'
-        )
+        existing_user = KeycloakRemoteUser({
+            'sub': 'some-sub'
+        })
 
         profile = django_keycloak.services.oidc_profile.\
             get_or_create_from_id_token(
@@ -126,9 +129,9 @@ class ServicesOpenIDProfileGetOrCreateFromIdTokenTestCase(
         Expected: existing oidc profile is returned with existing user linked
         to it.
         """
-        existing_user = UserFactory(
-            username='some-sub'
-        )
+        existing_user = KeycloakRemoteUser({
+            'sub': 'some-sub'
+        })
 
         existing_profile = RemoteUserOpenIdConnectProfileFactory(
             access_token='access-token',
