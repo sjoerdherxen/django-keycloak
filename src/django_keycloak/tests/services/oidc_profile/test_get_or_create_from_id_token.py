@@ -6,7 +6,7 @@ from django.test import TestCase
 from keycloak.openid_connect import KeycloakOpenidConnect
 
 from django_keycloak.factories import ClientFactory, \
-    OpenIdConnectProfileFactory, UserFactory
+    RemoteUserOpenIdConnectProfileFactory, UserFactory
 from django_keycloak.tests.mixins import MockTestCaseMixin
 
 import django_keycloak.services.oidc_profile
@@ -64,7 +64,7 @@ class ServicesOpenIDProfileGetOrCreateFromIdTokenTestCase(
         Expected: oidc user is created with information from the id token
         and linked to the profile.
         """
-        existing_profile = OpenIdConnectProfileFactory(
+        existing_profile = RemoteUserOpenIdConnectProfileFactory(
             access_token='access-token',
             expires_before=datetime(2018, 3, 5, 1, 0, 0),
             refresh_token='refresh-token',
@@ -130,7 +130,7 @@ class ServicesOpenIDProfileGetOrCreateFromIdTokenTestCase(
             username='some-sub'
         )
 
-        existing_profile = OpenIdConnectProfileFactory(
+        existing_profile = RemoteUserOpenIdConnectProfileFactory(
             access_token='access-token',
             expires_before=datetime(2018, 3, 5, 1, 0, 0),
             refresh_token='refresh-token',

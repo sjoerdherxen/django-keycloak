@@ -4,7 +4,7 @@ from requests.exceptions import HTTPError
 
 from django_keycloak.models import (
     Client,
-    OpenIdConnectProfile,
+    RemoteUserOpenIdConnectProfile,
     RemoteClient
 )
 import django_keycloak.services.permissions
@@ -40,7 +40,7 @@ refresh_certs.short_description = 'Refresh Certificates'
 
 
 def clear_client_tokens(modeladmin, request, queryset):
-    OpenIdConnectProfile.objects.filter(realm__in=queryset).update(
+    RemoteUserOpenIdConnectProfile.objects.filter(realm__in=queryset).update(
         access_token=None,
         expires_before=None,
         refresh_token=None,

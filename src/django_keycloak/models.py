@@ -159,7 +159,7 @@ class TokenModelAbstract(models.Model):
         return self.expires_before > timezone.now()
 
 
-class OpenIdConnectProfileAbstract(TokenModelAbstract):
+class RemoteUserOpenIdConnectProfileAbstract(TokenModelAbstract):
 
     sub = models.CharField(max_length=255, unique=True)
 
@@ -186,13 +186,10 @@ class OpenIdConnectProfileAbstract(TokenModelAbstract):
         )
 
 
-class RemoteUserOpenIdConnectProfile(OpenIdConnectProfileAbstract):
+class RemoteUserOpenIdConnectProfile(RemoteUserOpenIdConnectProfileAbstract):
 
     is_remote = True
     _user = None
-
-    class Meta(OpenIdConnectProfileAbstract.Meta):
-        swappable = 'KEYCLOAK_OIDC_PROFILE_MODEL'
 
     def get_user(self):
         if self._user is None:
@@ -214,18 +211,6 @@ class RemoteUserOpenIdConnectProfile(OpenIdConnectProfileAbstract):
         self._user = user
 
     user = property(get_user, set_user)
-
-
-class OpenIdConnectProfile(OpenIdConnectProfileAbstract):
-
-    is_remote = False
-
-    user = models.OneToOneField(settings.AUTH_USER_MODEL,
-                                related_name='oidc_profile',
-                                on_delete=models.CASCADE)
-
-    class Meta(RemoteUserOpenIdConnectProfile.Meta):
-        swappable = 'KEYCLOAK_OIDC_PROFILE_MODEL'
 
 
 class Nonce(models.Model):

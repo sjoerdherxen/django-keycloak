@@ -10,10 +10,6 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-    ]
-
     operations = [
         migrations.CreateModel(
             name='Client',
@@ -35,22 +31,6 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
-            name='OpenIdConnectProfile',
-            fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True,
-                                        serialize=False, verbose_name='ID')),
-                ('access_token', models.TextField(null=True)),
-                ('expires_before', models.DateTimeField(null=True)),
-                ('refresh_token', models.TextField(null=True)),
-                ('refresh_expires_before', models.DateTimeField(null=True)),
-                ('sub', models.CharField(max_length=255, unique=True)),
-            ],
-            options={
-                'abstract': False,
-                'swappable': 'KEYCLOAK_OIDC_PROFILE_MODEL',
-            },
-        ),
-        migrations.CreateModel(
             name='Realm',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True,
@@ -62,6 +42,27 @@ class Migration(migrations.Migration):
                 ('_certs', models.TextField()),
                 ('_well_known_oidc', models.TextField(blank=True)),
             ],
+        ),
+        migrations.CreateModel(
+            name='RemoteUserOpenIdConnectProfile',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True,
+                                        serialize=False, verbose_name='ID')),
+                ('access_token', models.TextField(null=True)),
+                ('expires_before', models.DateTimeField(null=True)),
+                ('refresh_token', models.TextField(null=True)),
+                ('refresh_expires_before', models.DateTimeField(null=True)),
+                ('sub', models.CharField(max_length=255, unique=True)),
+                ('realm', models.ForeignKey(
+                    on_delete=django.db.models.deletion.CASCADE,
+                    related_name='openid_profiles',
+                    to='django_keycloak.Realm'
+                )),
+            ],
+            options={
+                'abstract': False,
+                'swappable': 'KEYCLOAK_OIDC_PROFILE_MODEL',
+            },
         ),
         migrations.CreateModel(
             name='Role',
@@ -98,20 +99,6 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(
                 on_delete=django.db.models.deletion.CASCADE,
                 related_name='realms', to='django_keycloak.Server'),
-        ),
-        migrations.AddField(
-            model_name='openidconnectprofile',
-            name='realm',
-            field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE,
-                related_name='openid_profiles', to='django_keycloak.Realm'),
-        ),
-        migrations.AddField(
-            model_name='openidconnectprofile',
-            name='user',
-            field=models.OneToOneField(
-                on_delete=django.db.models.deletion.CASCADE,
-                related_name='oidc_profile', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
             model_name='client',

@@ -8,7 +8,7 @@ from freezegun import freeze_time
 from keycloak.openid_connect import KeycloakOpenidConnect
 
 from django_keycloak.factories import ClientFactory
-from django_keycloak.models import OpenIdConnectProfile
+from django_keycloak.models import RemoteUserOpenIdConnectProfile
 from django_keycloak.tests.mixins import MockTestCaseMixin
 
 import django_keycloak.services.oidc_profile
@@ -58,7 +58,7 @@ class ServicesKeycloakOpenIDProfileUpdateOrCreateTestCase(MockTestCaseMixin,
             issuer='https://issuer'
         )
 
-        profile = OpenIdConnectProfile.objects.get(sub='some-sub')
+        profile = RemoteUserOpenIdConnectProfile.objects.get(sub='some-sub')
         self.assertEqual(profile.sub, 'some-sub'),
         self.assertEqual(profile.access_token, 'access-token')
         self.assertEqual(profile.refresh_token, 'refresh-token')
@@ -83,7 +83,7 @@ class ServicesKeycloakOpenIDProfileUpdateOrCreateTestCase(MockTestCaseMixin,
             first_name='',
             last_name=''
         )
-        profile = OpenIdConnectProfile.objects.create(
+        profile = RemoteUserOpenIdConnectProfile.objects.create(
             realm=self.client.realm,
             sub='some-sub',
             user=user,

@@ -26,13 +26,13 @@ def get_remote_user(request):
 
     user = None
 
-    OpenIdConnectProfile = django_keycloak.services.oidc_profile\
+    RemoteUserOpenIdConnectProfile = django_keycloak.services.oidc_profile\
         .get_openid_connect_profile_model()
 
     try:
-        oidc_profile = OpenIdConnectProfile.objects.get(
+        oidc_profile = RemoteUserOpenIdConnectProfile.objects.get(
             realm=request.realm, sub=sub)
-    except OpenIdConnectProfile.DoesNotExist:
+    except RemoteUserOpenIdConnectProfile.DoesNotExist:
         pass
     else:
         if oidc_profile.refresh_expires_before > timezone.now():
