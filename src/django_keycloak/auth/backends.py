@@ -94,11 +94,12 @@ class KeycloakAuthorizationBase(object):
 class KeycloakAuthorizationCodeBackend(KeycloakAuthorizationBase):
 
     def authenticate(self, request, code, redirect_uri):
-
+        print("code backend")
         if not hasattr(request, 'realm'):
             raise ImproperlyConfigured(
                 'Add BaseKeycloakMiddleware to middlewares')
 
+        print(request.realm)
         keycloak_openid_profile = django_keycloak.services\
             .oidc_profile.update_or_create_from_code(
                 client=request.realm.client,
