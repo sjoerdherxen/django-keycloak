@@ -55,15 +55,24 @@ def remote_user_login(request, user, backend=None):
     if user is None:
         user = request.user
 
+    print("r1")
+
     if REMOTE_SESSION_KEY in request.session:
+        print("r1a")
         if _get_user_session_key(request) != user.identifier:
+            print("r1aa")
             request.session.flush()
     else:
+        print("r1b")
         request.session.cycle_key()
 
+    print("r2")
+
     try:
+        print("r3")
         backend = backend or user.backend
     except AttributeError:
+        print("r3 fail")
         backends = _get_backends(return_tuples=True)
         if len(backends) == 1:
             _, backend = backends[0]
@@ -75,13 +84,16 @@ def remote_user_login(request, user, backend=None):
             )
 
     if not hasattr(user, 'identifier'):
+        print("r4")
         raise ValueError(
             'The user does not have an identifier or the identifier is empty.'
         )
 
+    print("r5")
     request.session[REMOTE_SESSION_KEY] = user.identifier
     request.session[BACKEND_SESSION_KEY] = backend
     request.session[HASH_SESSION_KEY] = session_auth_hash
     if hasattr(request, 'user'):
+        print("r6")
         request.user = user
     rotate_token(request)
